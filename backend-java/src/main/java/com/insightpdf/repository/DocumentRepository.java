@@ -1,0 +1,5 @@
+package com.insightpdf.repository;
+import com.insightpdf.model.Document;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DocumentRepository extends JpaRepository<Document, Long> { }

@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: insightdb
+      POSTGRES_USER: insight
+      POSTGRES_PASSWORD: insightpwd
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  processor:
+    build: ./backend-python
+    container_name: insight-processor
+    depends_on:
+      - postgres
+    volumes:
+      - ./data:/data
+    ports:
+      - "5000:5000"
+
+  backend:
+    build: ./backend-java
+    container_name: insight-backend
+    depends_on:
+      - processor
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/insightdb
+      SPRING_DATASOURCE_USERNAME: insight
+      SPRING_DATASOURCE_PASSWORD: insightpwd
+    volumes:
+      - ./data:/data
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: insight-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:
